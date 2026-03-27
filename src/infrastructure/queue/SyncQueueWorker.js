@@ -1,4 +1,5 @@
 const { Worker } = require('bullmq');
+const config = require('../../config');
 const { getRedis } = require('../database/redis');
 const { connectMongo } = require('../database/mongodb');
 const MongoUserRepository = require('../persistence/MongoUserRepository');
@@ -15,7 +16,10 @@ async function startWorker() {
   const userRepo = new MongoUserRepository();
   const emailMatchRepo = new MongoEmailMatchRepository();
   const oauthClient = new YahooOAuthClient();
-  const imapClient = new ImapMailClient();
+  const imapClient = new ImapMailClient({
+    host: config.yahoo.imap.host,
+    port: config.yahoo.imap.port,
+  });
   const tokenService = new TokenService(userRepo, oauthClient);
   const mailSyncService = new MailSyncService(userRepo, emailMatchRepo, imapClient, tokenService);
 
